@@ -111,7 +111,11 @@ Packet level
 
 We sample a cluster identified in the latent space thanks to the GMM (Gaussian Mixture Model) and we use the VAE (Variational AutoEncoder) model decoder to reconstruct the parameters of the packet. The following scripts, in the folder ``scripts/modeling/packet/inference/``, are used:  
 
-* ``script_packet_generation.py``: shows how to generate a packet with the GMM (Gaussian Mixture Model) and the VAE (Variational Auto-Encoder).  
+* ``script_packet_generation.py``: shows how to generate a packet with the GMM (Gaussian Mixture Model) and the VAE (Variational Auto-Encoder).
+* ``generate_payload_time.py``: generate only ``payload_length`` and ``time_diff`` features
+  from the pretrained models. The script expects a CSV file containing a
+  ``flow_id`` column which determines how many flows and packets should be
+  created.
 
 
 Flow level
