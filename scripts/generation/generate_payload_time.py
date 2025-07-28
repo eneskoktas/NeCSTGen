@@ -70,10 +70,26 @@ IDX_TIME_DIFF = {"HTTP": 8, "UDP_GOOGLE_HOME": 5}
 IDX_PAYLOAD = {"HTTP": 15, "UDP_GOOGLE_HOME": 12}
 
 
-def scale_back(x: np.ndarray, col: str, df_raw: pd.DataFrame) -> np.ndarray:
-    """Reverse the normalization applied during training."""
+def scale_back(
+    x: np.ndarray, col: str, df_raw: pd.DataFrame, log_scale: bool = False
+) -> np.ndarray:
+    """Reverse the normalization applied during training.
+
+    Parameters
+    ----------
+    x : np.ndarray
+        Normalized values to scale back.
+    col : str
+        Column name in ``df_raw`` used to recover min and max.
+    df_raw : pd.DataFrame
+        Raw dataframe containing the original values.
+    log_scale : bool, optional
+        If ``True`` apply a base-10 exponentiation after rescaling to
+        undo the log10 transform used during training. Defaults to ``False``.
+    """
+
     scaled = x * (df_raw[col].max() - df_raw[col].min()) + df_raw[col].min()
-    return np.power(10, scaled)
+    return np.power(10, scaled) if log_scale else scaled
 
 
 def generate_packets(dec, gmm, n_packets: int) -> np.ndarray:
@@ -104,8 +120,18 @@ def main():
         feats = generate_packets(dec, gmm, int(count))
         cols = FEATURES[args.protocol]
         df_feat = pd.DataFrame(feats, columns=cols)
-        payl = scale_back(df_feat.iloc[:, IDX_PAYLOAD[args.protocol]].to_numpy(), "payload_length", df_raw)
-        time = scale_back(df_feat.iloc[:, IDX_TIME_DIFF[args.protocol]].to_numpy(), "time_diff", df_raw)
+        payl = scale_back(
+            df_feat.iloc[:, IDX_PAYLOAD[args.protocol]].to_numpy(),
+            "payload_length",
+            df_raw,
+            log_scale=False,
+        )
+        time = scale_back(
+            df_feat.iloc[:, IDX_TIME_DIFF[args.protocol]].to_numpy(),
+            "time_diff",
+            df_raw,
+            log_scale=True,
+        )
         tmp = pd.DataFrame({"flow_id": fid, "payload_length": payl, "time_diff": time})
         results.append(tmp)
 
