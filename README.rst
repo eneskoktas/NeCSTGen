@@ -113,7 +113,9 @@ We sample a cluster identified in the latent space thanks to the GMM (Gaussian M
 
 * ``script_packet_generation.py``: shows how to generate a packet with the GMM (Gaussian Mixture Model) and the VAE (Variational Auto-Encoder).
 * ``generate_payload_time.py``: generate only ``payload_length`` and ``time_diff`` features
-  from the pretrained models. The script expects a CSV file containing a
+  from the pretrained models. ``payload_length`` is rescaled linearly while
+  ``time_diff`` is decoded using an additional ``log10`` exponentiation to
+  restore the original time scale. The script expects a CSV file containing a
   ``flow_id`` column which determines how many flows and packets should be
   created.
 
