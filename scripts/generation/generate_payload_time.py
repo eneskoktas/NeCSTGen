@@ -88,7 +88,8 @@ def scale_back(
         undo the log10 transform used during training. Defaults to ``False``.
     """
 
-    scaled = x * (df_raw[col].max() - df_raw[col].min()) + df_raw[col].min()
+    col_data = np.log10(df_raw[col]) if log_scale else df_raw[col]
+    scaled = x * (col_data.max() - col_data.min()) + col_data.min()
     return np.power(10, scaled) if log_scale else scaled
 
 
